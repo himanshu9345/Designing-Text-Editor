@@ -1,7 +1,10 @@
+import Ropes
 class SimpleEditor:
     def __init__(self, document):
         self.document = document
+        # dictionary stuff is missing
         self.dictionary = set()
+        self.ropes = Ropes.Rope(document)
 
 
     def cut(self, i, j):
@@ -80,5 +83,7 @@ for n in range({}):
             
 
 if __name__ == "__main__":
-    b = EditorBenchmarker(["hello friends"], 100)
-    b.benchmark()
+
+    # b = EditorBenchmarker(["hello friends"], 100)
+    # b.benchmark()
+    s = SimpleEditor("Hello Friends")
