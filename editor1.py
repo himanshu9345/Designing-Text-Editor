@@ -86,4 +86,4 @@ if __name__ == "__main__":
 
     # b = EditorBenchmarker(["hello friends"], 100)
     # b.benchmark()
-    s = SimpleEditor("Hello Friends")
+    s = SimpleEditor("Hello_Friends")

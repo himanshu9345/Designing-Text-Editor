@@ -5,14 +5,19 @@ class Node():
     left = None
     right = None
     parent = None
-    
+    rweight = 0
+    '''
+    if node is leaf node the weight is length on text
+    if notde is internal then weight is left subtree's leves sum
+    '''
     def __init__(self, str1, size, par = None):
         self.weight = size
         self.text = str1
         self.parent = par
     
     def __str__(self):
-        str1 = "Node Info { " + "text : "+ self.text + " weight: "+ str(self.weight)+" }"
+        str1 = "Node Info { " + "text : "+ self.text + " weight: "+ str(self.weight) \
+        + " rweight: "+str(self.rweight) + " }"
         return str1
 
 
@@ -30,7 +35,12 @@ class Rope(object):
         # self.printTree(self.root)
         # print(self.searchIndex(self.root, 10))
         # self.printTree(self.concatenationOperation(self.root, self.root1))
-        self.split(self.root,7)
+        root1, root2=self.split(self.root,0)
+        print("Tree1")
+        self.printTree(root1)
+        print("Tree2")
+        self.printTree(root2)
+
     
     def createRopes(self, str1, start, end, parent):
         node = Node("", -1)
@@ -41,6 +51,7 @@ class Rope(object):
             node.left, sum1 = self.createRopes(str1, start, mid, node)
             node.right, sum2 = self.createRopes(str1, mid + 1, end, node)
             node.weight = sum1
+            node.rweight = sum2
             return node, sum1 + sum2
         else:
             node.weight = end - start + 1
@@ -75,6 +86,7 @@ class Rope(object):
         left_node.parent = new_node
         right_node.parent = new_node
         new_node.weight = self.getWeight(left_node)
+        new_node.rweight = self.getWeight(right_node)
         return new_node
     
     # still doublt if i needed this, since i have perent nodes
@@ -84,7 +96,13 @@ class Rope(object):
         return self.getWeight(node.left) + self.getWeight(node.right)  
 
     def split(self, node, index):
+        # split corner case
+        if index > node.weight + node.rweight:
+            return None, node
+        if index <= 1:
+            return node, None
         node_to_split, split_position = self.searchIndexReturnNode(node, index)
+        
         '''
         if char from which split has to happen, 
         - if its in the middle divide current node string to two parts and then create
@@ -99,13 +117,50 @@ class Rope(object):
 
         
         '''
+        # self.printTree(self.root)
+
         if split_position !=0:
             left_node = Node(node_to_split.text[:split_position], split_position, node_to_split)
             right_node = Node(node_to_split.text[split_position:], len(node_to_split.text)-split_position, node_to_split)
             node_to_split.left = left_node
             node_to_split.right = right_node
+            node_to_split.text = ""
+            node_to_split.weight = left_node.weight
+            node_to_split.rweight = right_node.weight
             node_to_split = node_to_split.right
-        print(node_to_split)
+        list1 = []
+        
+        self.splitAndDelete(node_to_split, list1, index)
+        new_part = self.constructTreeFromList(list1)
+        return node, new_part
+
+    def constructTreeFromList(self, list1):
+        new_root = list1[0]
+        for root in list1[1:]:
+            new_root = self.concatenationOperation(new_root, root)
+        return new_root
+
+    def splitAndDelete(self, node, list1, index):
+        k = 0
+        list1.append(node)
+        node = node.parent
+        node.rweight = 0
+        node.right = None
+        while node:
+            print(node)
+            if node.right and (node.weight + node.right.weight + node.right.rweight)  >= index :
+                list1.append(node.right)
+                k += node.right.weight + node.right.rweight
+                node.rweight = 0
+                node.right = None
+            if node.left:
+                node.weight = node.left.weight + node.left.rweight
+            if node.right:
+                node.rweight = node.right.weight + node.right.rweight
+            # if node.parent and node.parent.right != node:
+            #     node.parent.weight -= k
+            node = node.parent            
+
 
     def printTree(self, node, level=0):
         if node != None:
