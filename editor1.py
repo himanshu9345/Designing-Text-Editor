@@ -1,24 +1,77 @@
+'''
+1. not done tree rebalancing
+2. after cut -> paste index should be less than or equal to length of remaining string.
+    str1 = "qwerty"
+    s.cut(1,3)
+    str1 = "erty"
+    s.paste(any number from 1 to 4)
+
+'''
+# class SimpleEditor:
+#     def __init__(self, document):
+#         self.document = document
+#         self.dictionary = set()
+#         # On windows, the dictionary can often be found at:
+#         # C:/Users/{username}/AppData/Roaming/Microsoft/Spelling/en-US/default.dic
+#         # with open("/usr/share/dict/words") as input_dictionary:
+#         #     for line in input_dictionary:
+#         #         words = line.strip().split(" ")
+#         #         for word in words:
+#         #             self.dictionary.add(word)
+#         self.paste_text = ""
+
+
+#     def cut(self, i, j):
+#         self.paste_text = self.document[i:j]
+#         self.document = self.document[:i] + self.document[j:]
+
+#     def copy(self, i, j):
+#         self.paste_text = self.document[i:j]
+
+#     def paste(self, i):
+#         self.document = self.document[:i] + self.paste_text + self.document[i:]
+
+#     def get_text(self):
+#         return self.document
+
+#     def misspellings(self):
+#         result = 0
+#         for word in self.document.split(" "):
+#             if word not in self.dictionary:
+#                 result = result + 1
+#         return result
+
 import Ropes
 class SimpleEditor:
     def __init__(self, document):
         self.document = document
         # dictionary stuff is missing
         self.dictionary = set()
-        self.ropes = Ropes.Rope(document)
+        self.ropes = Ropes.Rope()
+        self.rope_root,_ = self.ropes.createRopes(document, 1, len(document), None)
 
 
     def cut(self, i, j):
-        self.paste_text = self.document[i:j]
-        self.document = self.document[:i] + self.document[j:]
+        self.rope_root, cut_node = self.ropes.deleteText(self.rope_root, i, j)
+        self.paste_text = self.ropes.reportOperation(cut_node)
+        # self.document = self.document[:i] + self.document[j:]
+        # print(self.paste_text,"cut")
 
     def copy(self, i, j):
-        self.paste_text = self.document[i:j]
+        self.paste_text = self.ropes.reportOperation(self.rope_root, i,j)
+        # print(self.paste_text,"gggg")
 
     def paste(self, i):
-        self.document = self.document[:i] + self.paste_text + self.document[i:]
+        new_node, _ = self.ropes.createRopes(self.paste_text, 1, len(self.paste_text), None)
+        left_part, right_part = self.ropes.split(self.rope_root, i)
+        # print(self.ropes.reportOperation(left_part),"past oppp")
+        # print(self.ropes.reportOperation(right_part),"paste oppp")
+
+        left_merged = self.ropes.concatenationOperation(left_part, new_node)
+        self.rope_root = self.ropes.concatenationOperation(left_merged,right_part)
 
     def get_text(self):
-        return self.document
+        return self.ropes.reportOperation(self.rope_root)
 
     def misspellings(self):
         result = 0
@@ -37,14 +90,14 @@ s = SimpleEditor('he;llo')"""
     editor_cut_paste = """
 for n in range({}):
     if n%2 == 0:
-        s.cut(1, 3)
+        s.cut(1, 20)
     else:
         s.paste(2)"""
 
     editor_copy_paste = """
 for n in range({}):
     if n%2 == 0:
-        s.copy(1, 3)
+        s.copy(1, 20)
     else:
         s.paste(2)"""
 
@@ -84,6 +137,14 @@ for n in range({}):
 
 if __name__ == "__main__":
 
-    # b = EditorBenchmarker(["hello friends"], 100)
-    # b.benchmark()
-    s = SimpleEditor("Hello_Friends")
+    b = EditorBenchmarker(["hello friendshello friendshello friendshello friendshello friendshello friendshello friendshello friends"], 100)
+    b.benchmark()
+    # s = SimpleEditor("Hello_Friends")
+    # s.copy(1,10)
+    # print(s.get_text(),"gg1")
+    
+    # s.cut(1,10)
+    # s.paste(1)
+
+
+    # print(s.get_text(),"gg")
