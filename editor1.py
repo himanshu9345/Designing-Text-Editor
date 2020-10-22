@@ -48,6 +48,12 @@ class SimpleEditor:
         # dictionary stuff is missing
         self.dictionary = set()
         self.ropes = Ropes.Rope()
+        # with open("C:\Users\hphim\OneDrive\Desktop\Tor Browser\Browser\dictionaries\en-US.dic") as input_dictionary:
+        #     for line in input_dictionary:
+        #         words = line.strip().split(" ")
+        #         for word in words:
+        #             self.dictionary.add(word)
+        self.paste_text = ""
         self.rope_root,_ = self.ropes.createRopes(document, 1, len(document), None)
 
 

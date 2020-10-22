@@ -95,11 +95,6 @@ class Rope(object):
         new_node.rweight = right_node.weight + right_node.rweight
         return new_node
     
-    # still doublt if i needed this, since i have perent nodes
-    def getWeight(self, node):
-        if not node.left and not node.right:
-            return node.weight
-        return self.getWeight(node.left) + self.getWeight(node.right)  
 
     def split(self, node, index):
         # print(node,  "inside split")
@@ -140,15 +135,11 @@ class Rope(object):
         last_visited = None
         sum_broken_weight = 0
         self.curr_merge_tree = None
-        self.fun1(node_to_split, last_visited, sum_broken_weight)
-        # if root_val > index:
-        #     self.splitAndDelete(node_to_split, list1, index)
-        # else:
-
-        # new_part = self.constructTreeFromList(list1)
+        self.splitAndDelete(node_to_split, last_visited, sum_broken_weight)
+     
         return node, self.curr_merge_tree
 
-    def fun1(self, node_curr, last_visited, sub_w):
+    def splitAndDelete(self, node_curr, last_visited, sub_w):
         if not last_visited:
             # print("leaf node", node_curr)
             sub_w += node_curr.weight
@@ -157,7 +148,7 @@ class Rope(object):
                 node_curr.parent.right = None
                 node_curr.parent = None 
                 self.curr_merge_tree = node_curr
-                self.fun1(curr_parent, node_curr, sub_w)
+                self.splitAndDelete(curr_parent, node_curr, sub_w)
 
             
         else:
@@ -187,7 +178,7 @@ class Rope(object):
 
             if not node_curr:
                 return
-            self.fun1(node_curr, last_visited, sub_w)
+            self.splitAndDelete(node_curr, last_visited, sub_w)
 
     def constructTreeFromList(self, list1):
         # print("inside construct")
@@ -200,55 +191,6 @@ class Rope(object):
         # print("going out construct")
         
         return new_root
-
-    def splitAndDelete(self, node, list1, index):
-        k = 0
-        list1.append(node)
-        # print("in split and del", node)
-        node = node.parent
-        node.rweight = 0
-        node.right = None
-        while node:
-            print(node)
-            if node.right and (node.weight + node.right.weight + node.right.rweight)  >= index :
-                list1.append(node.right)
-                # print(list1[-1],"to move")
-                k += node.right.weight + node.right.rweight
-                node.rweight = 0
-                node.right = None
-            if node.left:
-                node.weight = node.left.weight + node.left.rweight
-            if node.right:
-                node.rweight = node.right.weight + node.right.rweight
-            # if node.parent and node.parent.right != node:
-            #     node.parent.weight -= k
-            node = node.parent     
-        # print("out of split and del")
-    
-    def splitAndDeleteRight(self, node, list1, index):
-        k = 0
-        list1.append(node)
-        # print("in split and del", node)
-        node = node.parent
-        node.rweight = 0
-        node.right = None
-        while node:
-            # print(node)
-            if node.right and (node.weight + node.right.weight + node.right.rweight)  >= index :
-                list1.append(node.right)
-                # print(list1[-1],"to move")
-                k += node.right.weight + node.right.rweight
-                node.rweight = 0
-                node.right = None
-            if node.left:
-                node.weight = node.left.weight + node.left.rweight
-            if node.right:
-                node.rweight = node.right.weight + node.right.rweight
-            # if node.parent and node.parent.right != node:
-            #     node.parent.weight -= k
-            node = node.parent     
-        # print("out of split and del")
-               
 
     def deleteText(self, node, i, j):
         '''
